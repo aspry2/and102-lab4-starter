@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
 const val ARTICLE_EXTRA = "ARTICLE_EXTRA"
-private const val TAG = "ArticleAdapter"
+// private const val TAG = "ArticleAdapter"
 
 class ArticleAdapter(private val context: Context, private val articles: List<Article>) :
     RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
@@ -54,7 +54,7 @@ class ArticleAdapter(private val context: Context, private val articles: List<Ar
             // Gets selected article
             val article = articles[absoluteAdapterPosition]
 
-            // Navigates to Details screen and pass selected article
+            // Navigates to Details screen and passes in selected article
             val intent = Intent(context, DetailActivity::class.java)
             intent.putExtra(ARTICLE_EXTRA, article)
             context.startActivity(intent)

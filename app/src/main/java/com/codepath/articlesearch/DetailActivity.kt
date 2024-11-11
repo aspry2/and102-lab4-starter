@@ -1,12 +1,13 @@
 package com.codepath.articlesearch
 
+import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 
-private const val TAG = "DetailActivity"
+// private const val TAG = "DetailActivity"
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var mediaImageView: ImageView
@@ -18,12 +19,26 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        // TODO: Find the views for the screen
+        // Find the views for the screen
+        mediaImageView = findViewById(R.id.mediaImage)
+        titleTextView = findViewById(R.id.mediaTitle)
+        bylineTextView = findViewById(R.id.mediaByline)
+        abstractTextView = findViewById(R.id.mediaAbstract)
 
-        // TODO: Get the extra from the Intent
+        // Get the extra from the Intent - using different method depending on sdk version
+        var article = intent.getSerializableExtra(ARTICLE_EXTRA) as Article
+        if (Build.VERSION.SDK_INT >= 33) {
+            article = intent.getSerializableExtra(ARTICLE_EXTRA, Article::class.java) as Article
+        }
 
-        // TODO: Set the title, byline, and abstract information from the article
+        // Set the title, byline, and abstract information from the article
+        titleTextView.text = article.headline?.main
+        bylineTextView.text = article.byline?.original
+        abstractTextView.text = article.abstract
 
-        // TODO: Load the media image
+        // Load the media image
+        Glide.with(this)
+            .load(article.mediaImageUrl)
+            .into(mediaImageView)
     }
 }
