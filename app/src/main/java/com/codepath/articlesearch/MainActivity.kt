@@ -25,7 +25,7 @@ private const val ARTICLE_SEARCH_URL =
     "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=${SEARCH_API_KEY}"
 
 class MainActivity : AppCompatActivity() {
-    private val articles = mutableListOf<Article>()
+    private val articles = mutableListOf<DisplayArticle>()
     private lateinit var articlesRecyclerView: RecyclerView
     private lateinit var binding: ActivityMainBinding
 
@@ -68,7 +68,8 @@ class MainActivity : AppCompatActivity() {
                     // Saves the articles
                     parsedJson.response?.docs.let { list ->
                         if (list != null) {
-                            articles.addAll(list)
+                            // TODO: Update to use insert method
+                            // articles.addAll(list)
 
                             // Reloads the screen
                             articleAdapter.notifyDataSetChanged()
