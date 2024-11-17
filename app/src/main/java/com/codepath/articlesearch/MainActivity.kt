@@ -3,12 +3,15 @@ package com.codepath.articlesearch
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.codepath.articlesearch.databinding.ActivityMainBinding
 import com.codepath.asynchttpclient.AsyncHttpClient
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import okhttp3.Headers
 import org.json.JSONException
@@ -65,14 +68,26 @@ class MainActivity : AppCompatActivity() {
                         SearchNewsResponse.serializer(),
                         json.jsonObject.toString()
                     )
-                    // Saves the articles
+                    // Displays the cached articles by deleting old article in the database
+                    // and inserting the new data. Then it maps the Article API to ArticleEntity
+                    // and clears the cache.
                     parsedJson.response?.docs.let { list ->
-                        if (list != null) {
-                            // TODO: Update to use insert method
-                            // articles.addAll(list)
-
-                            // Reloads the screen
-                            articleAdapter.notifyDataSetChanged()
+                        // Use coroutine to run articleDao interactions. Database operations
+                        // can take a while and aren't allowed to run on the main UI thread
+                        // to avoid slowing down the app
+                        lifecycleScope.launch(IO) {
+                            (application as ArticleApplication).db.articleDao().deleteAll()
+                            if (list != null) {
+                                (application as ArticleApplication).db.articleDao().insertAll(
+                                    list.map {
+                                        ArticleEntity(
+                                            headline = it.headline?.main,
+                                            articleAbstract = it.abstract,
+                                            byline = it.byline?.original,
+                                            mediaImageUrl = it.mediaImageUrl
+                                        )
+                                    })
+                            }
                         }
                     }
 
